@@ -12,12 +12,16 @@
 # -----------
 
 """
+This module contains the `date_range_str` method. It will take a string
+that contains a potential date range and return the date range. There
+are also many help methods in this module.
 """
 
 # ------------
 # System Modules - Included with Python
 
-from datetime import datetime, date
+from datetime import date
+from typing import Optional
 
 # ------------
 # 3rd Party - From PyPI
@@ -25,21 +29,25 @@ from datetime import datetime, date
 # ------------
 # Custom Modules
 
-import .datestr as DTS
+from . import datestr as dts
 
 # -------------
 
-def date_range_from_year(year):
+def date_range_from_year(year:int) -> tuple[date, date]:
     """
-    Given a year, return a tuple containing the start and end date of the year.
+    Given a year, return a tuple containing the start and end date of
+    the year.
     """
 
     return (date(year, 1, 1), date(year, 12, 31))
 
 
-def date_range_from_year_month(year, month):
+def date_range_from_year_month(
+        year:int,
+        month:int) -> tuple[date, date]:
     """
-    Given a year-month, return a tuple containing the start and end date of the month.
+    Given a year and a month, return a tuple containing the start and
+    end date of the month.
     """
 
     # start date is the first day of the month
@@ -49,11 +57,15 @@ def date_range_from_year_month(year, month):
     )
 
 
-def date_range_from_day(year, month, day):
+def date_range_from_day(
+        year:int,
+        month:int,
+        day:int) -> tuple[date, date]:
     """
-    Given a year-month, return a tuple containing the start and end date of the day
-    - the start and end will be the same.
+    Given a year, a month and a day, return a tuple containing the start
+    and end date of the day
 
+    NOTE: The start and end will be the same.
     """
 
     # make sure this is valid
@@ -62,111 +74,183 @@ def date_range_from_day(year, month, day):
     return (d, d)
 
 
-def date_range_from_week(year, week):
+def date_range_from_week(year:int, week:int) -> tuple[date, date]:
     """
-    Given a year-week, return a tuple containing the start and end date of the week.
+    Given a year and a isoweek number, return a tuple containing the
+    start and end date of the week.
 
     """
 
     return dts.isoweek_date_range(year, week)
 
 
-def date_range_from_weekoffset(year, week, offset):
+def date_range_from_weekoffset(
+        year:int,
+        week:int,
+        offset:int) -> tuple[date, date]:
     """
-    Given a week offset (0, -1, -2, ... -n), return a tuple containing the start and end date of the week.
+    Given a year, a week and a week offset (0, -1, -2, ... -n), return a
+    tuple containing the start and end date of the week.
     """
 
-    return dts.isoweek_date_range(*dts.isoweek_from_delta(year, week, offset))
+    return dts.isoweek_date_range(
+        *dts.isoweek_from_delta(year, week, offset),
+    )
 
 
-def handle_date_switch(user_date: str) -> tuple[datetime, datetime]:
+def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
     """
-    This method is designed to handle the --date switch option where the user can
-    enter a string that represents some sort of date range they are interested in.
+    Takes the user date string and returns a time range tuple.
 
-    The date of interest can be of the form:
-    1. A 4 digit year -> yyyy -> 0000 - 9999
-    2. An isoyear-iso month (yyyy-mm)
-    3. Isoweek (yyyyWnn), week (01 - 53) - assumes it is a week in the past of the current year
-    4. Isodate - a date in iso format (yyyy-mm-dd)
-    5. Week number - 1 to 53 - assumes current year
-    6. Week offset (0, -1, -2) - the relative week less than or equal to 0,
-    6. date range (yyyy-mm-dd-yyyy-mm-dd) - start date and end date
+    # Args
 
+    - user_date
+        - The date range string provided by the user
 
-    # Parameter
+        - The possibilities are:
 
-    user_date - str
-        - the date type they are interested in using. It follows the above list
+        - A 4 digit year -> yyyy -> 0000 - 9999
+
+        - An isoyear-iso month (yyyy-mm)
+
+        - Isoweek (yyyyWnn), week (01 - 53)
+            - assumes it is a week in the past of the current year
+
+        - Isodate - a date in iso format (yyyy-mm-dd)
+
+        - Week number - 1 to 53
+            - assumes current year
+
+        - Week offset (0, -1, -2)
+            - the relative week less than or equal to 0,
+
+        - date range
+            - that is one yyyy-mm-dd to another ("yyyy-mm-dd to yyyy-mm-dd")
 
     # Return
 
-    A list containing the start and end date to the range provided by the user.
-
-    This ranges returned will be:
-    1. yyyy-01-01 to yyyy-12-31
-    2. yyyy-mm-01 to yyyy-mm-XX where XX will be the last day of the month
-    3. yyyy-mm-XX to yyyy-mm-YY where XX will be the start of the iso week and YY will be the end of the isoweek. The month and year will change appropriately
-    4. yyyy-mm-dd to yyyy-mm-dd
-    5. See 3. -> Just a different way of specifying the week number
-    6. See 3. -> Just a different way of specifying the week number
-    7. 1234-12-01 to 1235-12-31
+    A tuple containing the start and end date
 
     """
 
-    dates = []
-
     value = dts.date_from_string(user_date)
 
-    if value:
+    if value is None:
+        return None
+
+    if key:="year" in value:
+        # value['year'] -> returns an integer
+        return date_range_from_year(value[key])
+
+    if key:="year-month" in value:
+        # value['year-month']-> tuple(int(year), int(mm))
+        return date_range_from_year_month(*value[key])
+
+    if key:="year-month-day" in value:
+        # value['year-month-day']-> tuple(int(year), int(mm), int(dd))
+        try:
+
+            return date_range_from_day(*value[key])
+
+        except ValueError as ve:
+            raise ValueError(f"{user_date} is an invalid date!") from ve
+
+    if key:="year-week" in value:
+            # value['year-week'] -> tuple(int(year), int(week))
+            return date_range_from_week(*value[key])
+
+    if key:="week-offset" in value:
+        # value['week-offset']-> int
 
         today = dt.now().date()
+        iso_year, iso_week, _ = today.isocalendar()
 
-        iso_year_current, iso_week_current, _ = today.isocalendar()
+        return date_range_from_weekoffset(
+            iso_year,
+            iso_week,
+            value[key],
+        )
 
-        if "year" in value:
-            # value['year'] -> returns an integer
-            dates.extend(date_range_from_year(value["year"]))
+    if key:="week-number" in value:
+        # value['week-number'] -> int
 
-        if "year-month" in value:
-            # value['year-month']-> tuple(int(year), int(mm))
-            dates.extend(date_range_from_year_month(*value["year-month"]))
+        today = dt.now().date()
+        iso_year, _, _ = today.isocalendar()
 
-        if "year-month-day" in value:
-            # value['year-month-day']-> tuple(int(year), int(mm), int(dd))
+        return date_range_from_week(iso_year, value[key])
 
-            try:
+    if ke:="date-range" in value:
 
-                dates.extend(date_range_from_day(*value["year-month-day"]))
+        sd, ed = value[key]
 
-            except ValueError as ve:
+        try:
 
-                raise Value(f"{user_date} is an invalid date!") from ve
+            start_date = date(*sd)
+            end_date = date(*ed)
 
-        if "year-week" in value:
-            # value['year-week'] -> tuple(int(year), int(week))
+        except ValueError as ve:
+            raise ValueError(f"{user_date} contains an invalid date!") from ve
 
-            dates.extend(date_range_from_week(*value["year-week"]))
+        return (start_date, end_date)
 
-        if "week-offset" in value:
-            # value['week-offset']-> int
+    return None
 
-            dates.extend(
-                date_range_from_weekoffset(
-                    iso_year_current, iso_week_current, value["week-offset"]
-                )
-            )
 
-        if "week-number" in value:
-            # value['week-number'] -> int
 
-            dates.extend(date_range_from_week(iso_year_current, value["week-number"]))
+    # --------------
+    # dates = []
 
-        if "date-range" in value:
+    # value = dts.date_from_string(user_date)
 
-            sd, ed = value["date-range"]
+    # if value:
 
-            dates.append(date(*sd))
-            dates.append(date(*ed))
+    #     today = dt.now().date()
 
-    return tuple(dates)
+    #     iso_year_current, iso_week_current, _ = today.isocalendar()
+
+    #     if "year" in value:
+    #         # value['year'] -> returns an integer
+    #         dates.extend(date_range_from_year(value["year"]))
+
+    #     if "year-month" in value:
+    #         # value['year-month']-> tuple(int(year), int(mm))
+    #         dates.extend(date_range_from_year_month(*value["year-month"]))
+
+    #     if "year-month-day" in value:
+    #         # value['year-month-day']-> tuple(int(year), int(mm), int(dd))
+
+    #         try:
+
+    #             dates.extend(date_range_from_day(*value["year-month-day"]))
+
+    #         except ValueError as ve:
+
+    #             raise Value(f"{user_date} is an invalid date!") from ve
+
+    #     if "year-week" in value:
+    #         # value['year-week'] -> tuple(int(year), int(week))
+
+    #         dates.extend(date_range_from_week(*value["year-week"]))
+
+    #     if "week-offset" in value:
+    #         # value['week-offset']-> int
+
+    #         dates.extend(
+    #             date_range_from_weekoffset(
+    #                 iso_year_current, iso_week_current, value["week-offset"]
+    #             )
+    #         )
+
+    #     if "week-number" in value:
+    #         # value['week-number'] -> int
+
+    #         dates.extend(date_range_from_week(iso_year_current, value["week-number"]))
+
+    #     if "date-range" in value:
+
+    #         sd, ed = value["date-range"]
+
+    #         dates.append(date(*sd))
+    #         dates.append(date(*ed))
+
+    # return tuple(dates)

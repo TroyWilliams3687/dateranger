@@ -45,7 +45,17 @@ Takes a string representing some sort of date or date range in the form of:
 
 ## Usage
 
-Build the virtual environment or run the tests with the [make](make.md) files.
+Build the virtual environment or run the tests with the [make](make.md) files and use the module like:
+
+```python
+>>> from dateranger.dateranger import date_range_str
+
+>>> date_range_str('2020-01-01 - 2020-07-31')
+(date(2020,1,1),date(2020,7,31))
+
+>>> date_range_str('2022W03')
+(date(2022,1,17),date(2022,1,23))
+```
 
 ## License
 

@@ -20,7 +20,10 @@ are also many help methods in this module.
 # ------------
 # System Modules - Included with Python
 
+import calendar
+
 from datetime import date
+from datetime import datetime as dt
 from typing import Optional
 
 # ------------
@@ -98,7 +101,10 @@ def date_range_from_weekoffset(
     )
 
 
-def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
+def date_range_str(
+        user_date: str,
+        today:date=dt.now().date()
+    ) -> Optional[tuple[date, date]]:
     """
     Takes the user date string and returns a time range tuple.
 
@@ -138,15 +144,15 @@ def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
     if value is None:
         return None
 
-    if key:="year" in value:
+    if (key:="year") in value:
         # value['year'] -> returns an integer
         return date_range_from_year(value[key])
 
-    if key:="year-month" in value:
+    if (key:="year-month") in value:
         # value['year-month']-> tuple(int(year), int(mm))
         return date_range_from_year_month(*value[key])
 
-    if key:="year-month-day" in value:
+    if (key:="year-month-day") in value:
         # value['year-month-day']-> tuple(int(year), int(mm), int(dd))
         try:
 
@@ -155,14 +161,13 @@ def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
         except ValueError as ve:
             raise ValueError(f"{user_date} is an invalid date!") from ve
 
-    if key:="year-week" in value:
+    if (key:="year-week") in value:
             # value['year-week'] -> tuple(int(year), int(week))
             return date_range_from_week(*value[key])
 
-    if key:="week-offset" in value:
+    if (key:="week-offset") in value:
         # value['week-offset']-> int
 
-        today = dt.now().date()
         iso_year, iso_week, _ = today.isocalendar()
 
         return date_range_from_weekoffset(
@@ -171,15 +176,14 @@ def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
             value[key],
         )
 
-    if key:="week-number" in value:
+    if (key:="week-number") in value:
         # value['week-number'] -> int
 
-        today = dt.now().date()
         iso_year, _, _ = today.isocalendar()
 
         return date_range_from_week(iso_year, value[key])
 
-    if ke:="date-range" in value:
+    if (key:="date-range") in value:
 
         sd, ed = value[key]
 
@@ -194,63 +198,3 @@ def date_range_str(user_date: str) -> Optional[tuple[date, date]]:
         return (start_date, end_date)
 
     return None
-
-
-
-    # --------------
-    # dates = []
-
-    # value = dts.date_from_string(user_date)
-
-    # if value:
-
-    #     today = dt.now().date()
-
-    #     iso_year_current, iso_week_current, _ = today.isocalendar()
-
-    #     if "year" in value:
-    #         # value['year'] -> returns an integer
-    #         dates.extend(date_range_from_year(value["year"]))
-
-    #     if "year-month" in value:
-    #         # value['year-month']-> tuple(int(year), int(mm))
-    #         dates.extend(date_range_from_year_month(*value["year-month"]))
-
-    #     if "year-month-day" in value:
-    #         # value['year-month-day']-> tuple(int(year), int(mm), int(dd))
-
-    #         try:
-
-    #             dates.extend(date_range_from_day(*value["year-month-day"]))
-
-    #         except ValueError as ve:
-
-    #             raise Value(f"{user_date} is an invalid date!") from ve
-
-    #     if "year-week" in value:
-    #         # value['year-week'] -> tuple(int(year), int(week))
-
-    #         dates.extend(date_range_from_week(*value["year-week"]))
-
-    #     if "week-offset" in value:
-    #         # value['week-offset']-> int
-
-    #         dates.extend(
-    #             date_range_from_weekoffset(
-    #                 iso_year_current, iso_week_current, value["week-offset"]
-    #             )
-    #         )
-
-    #     if "week-number" in value:
-    #         # value['week-number'] -> int
-
-    #         dates.extend(date_range_from_week(iso_year_current, value["week-number"]))
-
-    #     if "date-range" in value:
-
-    #         sd, ed = value["date-range"]
-
-    #         dates.append(date(*sd))
-    #         dates.append(date(*ed))
-
-    # return tuple(dates)

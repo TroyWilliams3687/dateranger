@@ -12,14 +12,13 @@
 # -----------
 
 """
-
 """
 
 # ------------
 # System Modules - Included with Python
 
-# from datetime import datetime as dt
-# from datetime import date
+
+from datetime import date
 # from datetime import time
 
 # ------------
@@ -31,147 +30,159 @@ import pytest
 # Custom Modules
 
 from dateranger.datestr import date_from_string
+from dateranger.dateranger import date_range_str
 
 # ------------
+# 'year'
 
-years = []
-years.append(('2022', 2022))
-years.append(('0000', 0))
-years.append(('0105', 105))
-years.append(('1974', 1974))
+data = []
+data.append(('year','2022', 2022))
+data.append(('year','0000', 0))
+data.append(('year','0105', 105))
+data.append(('year','1974', 1974))
 
-years.append(('YYYY', None))
+# ------------
+# 'year-month'
 
+data.append(('year-month','2022-03', (2022,3)))
+data.append(('year-month','0000-04', (0,4)))
+data.append(('year-month','0105-05', (105,5)))
+data.append(('year-month','1974-07', (1974,7)))
 
-@pytest.mark.parametrize('data', years)
-def test_date_from_string(data):
+# ------------
+# 'year-month-day'
 
-    value, result = data
+data.append(('year-month-day','2022-03-14', (2022,3,14)))
+data.append(('year-month-day','0000-04-07', (0,4,7)))
+data.append(('year-month-day','0105-05-22', (105,5,22)))
+data.append(('year-month-day','1974-07-31', (1974,7,31)))
 
-    assert dts.date_from_string(value) == result
+# ------------
+# 'year-week'
 
+data.append(('year-week','2022W03', (2022, 3)))
+data.append(('year-week','0000W04', (0, 4)))
+data.append(('year-week','0105W22', (105, 22)))
+data.append(('year-week','1974W18', (1974, 18)))
 
+# ------------
+# 'week-offset' Valid from 0 to -n
 
-# =============
-# =============
-# =============
-# =============
-# # Test - Iso-date (yyyy-mm-dd) Extraction
+data.append(('week-offset','-10', -10))
+data.append(('week-offset','-5', -5))
+data.append(('week-offset','0', 0))
 
-# iso_dates = []
+# ------------
+# 'week-number' - Valid from 01 to 53
 
-# # No Matches
-# iso_dates.append(('2009', []))
-# iso_dates.append(('2009-001', []))
-# iso_dates.append(('2009-05', []))
-# iso_dates.append(('2009-123', []))
-# iso_dates.append(('2009-W511', []))
-# iso_dates.append(('20090621T0545Z', []))
-# iso_dates.append(('2009123', []))
-# iso_dates.append(('2009W511', []))
+data.append(('week-number','10', 10))
+data.append(('week-number','5', 5))
+data.append(('week-number','1', 1))
+data.append(('week-number','53', 53))
+data.append(('week-number','01', 1))
+data.append(('week-number','05', 5))
 
-# # Matches
-# iso_dates.append(('# 2020-09-18 - 2021-12-31', [date(2020, 9, 18), date(2021, 12, 31)]))
-# iso_dates.append(('2007-04-05T24:00', [date(2007, 4, 5)]))
-# iso_dates.append(('2007-04-06T00:00', [date(2007, 4, 6)]))
-# iso_dates.append(('2009-05-19T14:39Z', [date(2009, 5, 19)]))
-# iso_dates.append(('2010-02-18T16,2283', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16.23334444', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16:23,25', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16:23.4', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16:23:48,3-06:00', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16:23:48,444', [date(2010, 2, 18)]))
-# iso_dates.append(('2010-02-18T16:23:48.5', [date(2010, 2, 18)]))
+# ------------
+# 'date-range'
 
-# # -----------
-# # Date Range from Isoweek Testing
+data.append(('date-range','1974-07-01 - 1974-07-31', ((1974,7,1), (1974,7,31))))
+data.append(('date-range','1974-07-01 - 1974-07-05', ((1974,7,1), (1974,7,5))))
+data.append(('date-range','2020-01-01 - 2020-07-31', ((2020,1,1), (2020,7,31))))
 
-# daterange_data = []
-# daterange_data.append((date(2020,7,24), (date(2020,7,20), date(2020,7,26))))
-# daterange_data.append((date(2020,7,26), (date(2020,7,20), date(2020,7,26))))
-# daterange_data.append((date(2020,7,20), (date(2020,7,20), date(2020,7,26))))
+# ------------
+# Test date_from_string - matches
 
-# @pytest.mark.parametrize('search', daterange_data)
-# def test_isoweek_date_range_from_day(search):
-#     assert dts.isoweek_date_range_from_day(search[0]) == search[1]
+@pytest.mark.parametrize('data', data)
+def test_date_from_string_year(data):
 
+    key, value, result = data
 
-# # ----------
-# # isoweek date range
-
-# daterange_data = []
-# daterange_data.append(((2020, 30), (date(2020,7,20), date(2020,7,26))))
-# daterange_data.append(((2020, 29), (date(2020,7,13), date(2020,7,19))))
-# daterange_data.append(((2020, 31), (date(2020,7,27), date(2020,8,2))))
-
-# @pytest.mark.parametrize('search', daterange_data)
-# def test_isoweek_date_range(search):
-#     assert dts.isoweek_date_range(*search[0]) == search[1]
-
-# # ------------
-# # Isoweek offset
-
-# daterange_data = []
-# daterange_data.append(((2020, 30, -1), (2020, 29)))
-# daterange_data.append(((2020,  1, -1), (2019, 52)))
-# daterange_data.append(((2020, 30, -10), (2020, 20)))
-# daterange_data.append(((2020, 30, 62), (2021, 39)))
-
-# @pytest.mark.parametrize('search', daterange_data)
-# def test_isoweek_from_delta(search):
-#     assert dts.isoweek_from_delta(*search[0]) == search[1]
-
-# # ------------
-# # date_from_string testing
-
-# dfst_data = []
-
-# # yyyy
-# dfst_data.append(('1986', {'year':1986}))
-# dfst_data.append(('2025', {'year':2025}))
-# dfst_data.append(('0856', {'year':856}))
+    assert date_from_string(value)[key] == result
 
 
-# # yyyy-mm
-# dfst_data.append(('1986-12', {'year-month':(1986, 12)}))
-# dfst_data.append(('2019-11', {'year-month':(2019, 11)}))
-# dfst_data.append(('2019-01', {'year-month':(2019, 1)}))
-# dfst_data.append(('2019-05', {'year-month':(2019, 5)}))
-# dfst_data.append(('2019-09', {'year-month':(2019, 9)}))
-# dfst_data.append(('2019-9', None))
-# dfst_data.append(('1986-13', None))
-# dfst_data.append(('1986-133', None))
-# dfst_data.append(('1986--13', None))
+# ===========
+# ===========
+# No Matches
 
-# # yyyy-mm-dd
-# dfst_data.append(('2019-11-22', {'year-month-day':(2019, 11, 22)}))
-# dfst_data.append(('0856-11-22', {'year-month-day':(856, 11, 22)}))
-# dfst_data.append(('2014-07-31', {'year-month-day':(2014, 7, 31)}))
-# dfst_data.append(('2019-11-35', None))
+# ------------
+# 'year-month'
 
-# #yyyyWnn
-# dfst_data.append(('2019w11', {'year-week':(2019, 11)}))
-# dfst_data.append(('2019W11', {'year-week':(2019, 11)}))
-# dfst_data.append(('2020w35', {'year-week':(2020, 35)}))
-# dfst_data.append(('2020w1',  {'year-week':(2020, 1)}))
-# dfst_data.append(('202035', None))
-# dfst_data.append(('2012w45', {'year-week':(2012, 45)}))
+data = []
+data.append(('year','YYYY', None))
+data.append(('year','This is a test', None))
+data.append(('year','', None))
 
-# # week offset
-# dfst_data.append(('0', {'week-offset':0}))
-# dfst_data.append(('-1', {'week-offset':-1}))
-# dfst_data.append(('-10', {'week-offset':-10}))
-# dfst_data.append(('-1 ', None))
+# ------------
+# 'year-month'
 
-# # week number
-# dfst_data.append(('1', {'week-number':1}))
-# dfst_data.append(('01', {'week-number':1}))
-# dfst_data.append(('10', {'week-number':10}))
-# dfst_data.append(('100', None))
+data.append(('year-month','2022-14', None))
+data.append(('year-month','Hello World', None))
+data.append(('year-month','105-05', None))
+
+# ------------
+# 'year-month-day'
+
+data.append(('year-month-day','2022-13-14', None))
+data.append(('year-month-day','0000-04-32', None))
+data.append(('year-month-day','1974-0-31', None))
+
+# ------------
+# 'year-week'
+
+data.append(('year-week','2022W55', None))
+data.append(('year-week','0000W-04', None))
 
 
-# @pytest.mark.parametrize('search', dfst_data)
-# def test_date_from_string(search):
-#     assert dts.date_from_string(search[0]) == search[1]
+# ------------
+# 'week-offset'
+
+# data.append(('week-offset','-0-5', None))
+
+# NOTE: Not really much to test here
+
+# ------------
+# 'week-number'
+
+data.append(('week-number','54', None))
+
+# ------------
+# 'date-range'
+
+data.append(('date-range','1974-07-01 - ', None))
+data.append(('date-range',' - 1974-07-05', None))
+data.append(('date-range','aeser-01-01 - 2020-07-31', None))
+data.append(('date-range','2020-02-32 - 2020-07-31', None))
 
 
+@pytest.mark.parametrize('data', data)
+def test_date_from_string_year_no_matches(data):
+
+    key, value, result = data
+
+    assert date_from_string(value) is None
+
+# ============
+#  Testing date_from_str
+
+data = []
+data.append(('2022',(date(2022,1,1), date(2022,12,31))))
+data.append(('2022-07',(date(2022,7,1), date(2022,7,31))))
+data.append(('2022-07-31',(date(2022,7,31), date(2022,7,31))))
+data.append(('2022W03', (date(2022,1,17),date(2022,1,23))))
+data.append(('2020-01-01 - 2020-07-31', (date(2020,1,1), date(2020,7,31)) ))
+
+# week offset
+data.append((date(2022, 3, 1), '-1', (date(2022,2,21),date(2022,2,27))))
+
+# Week number
+data.append((date(2022, 3, 1), '1', (date(2022,1,3),date(2022,1,9))))
+
+@pytest.mark.parametrize('data', data)
+def test_date_from_str(data):
+
+    match data:
+        case (today, value, result):
+            assert date_range_str(value, today=today) == result
+
+        case (value, result):
+            assert date_range_str(value) == result

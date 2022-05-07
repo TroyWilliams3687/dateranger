@@ -20,10 +20,11 @@ are also many help methods in this module.
 # ------------
 # System Modules - Included with Python
 
-import calendar
+# import calendar
+
+import pendulum
 
 from datetime import date
-from datetime import datetime as dt
 from typing import Optional
 
 # ------------
@@ -36,34 +37,38 @@ from . import datestr as dts
 
 # -------------
 
-def date_range_from_year(year:int) -> tuple[date, date]:
+def date_range_from_year(year:int) -> pendulum.period:
     """
     Given a year, return a tuple containing the start and end date of
     the year.
     """
 
-    return (date(year, 1, 1), date(year, 12, 31))
+    sd = pendulum.date(year, 1, 1)
+
+    return pendulum.period(
+        sd,
+        sd.end_of('year'),
+    )
 
 
 def date_range_from_year_month(
         year:int,
-        month:int) -> tuple[date, date]:
+        month:int) -> pendulum.period:
     """
     Given a year and a month, return a tuple containing the start and
     end date of the month.
     """
 
-    # start date is the first day of the month
-    return (
-        date(year, month, 1),
-        date(year, month, calendar.monthrange(year, month)[-1]),
+    return pendulum.period(
+        sd := pendulum.date(year, month, 1),
+        sd.end_of('month'),
     )
 
 
 def date_range_from_day(
         year:int,
         month:int,
-        day:int) -> tuple[date, date]:
+        day:int) -> pendulum.period:
     """
     Given a year, a month and a day, return a tuple containing the start
     and end date of the day
@@ -71,40 +76,50 @@ def date_range_from_day(
     NOTE: The start and end will be the same.
     """
 
-    # make sure this is valid
-    d = date(year, month, day)
+    return pendulum.period(
+        d := pendulum.date(year, month, day),
+        d,
+    )
 
-    return (d, d)
 
-
-def date_range_from_week(year:int, week:int) -> tuple[date, date]:
+def date_range_from_week(year:int, week:int) -> pendulum.period:
     """
     Given a year and a isoweek number, return a tuple containing the
     start and end date of the week.
 
     """
 
-    return dts.isoweek_date_range(year, week)
+    sd = date.fromisocalendar(year, week, 1)  # Monday
+    sd = pendulum.date(sd.year, sd.month, sd.day)
+
+    ed = sd.end_of('week')
+
+    return pendulum.period(sd, ed)
 
 
 def date_range_from_weekoffset(
         year:int,
         week:int,
-        offset:int) -> tuple[date, date]:
+        offset:int) -> pendulum.period:
     """
     Given a year, a week and a week offset (0, -1, -2, ... -n), return a
     tuple containing the start and end date of the week.
     """
 
-    return dts.isoweek_date_range(
-        *dts.isoweek_from_delta(year, week, offset),
-    )
+    # Find the Monday from the iso_year and iso_week
+    sd = date.fromisocalendar(year, week, 1)
+    sd = pendulum.date(sd.year, sd.month, sd.day)
+
+    sd = sd.add(weeks=offset)
+    ed = sd.end_of('week')
+
+    return pendulum.period(sd, ed)
 
 
 def date_range_str(
         user_date: str,
-        today:date=dt.now().date()
-    ) -> Optional[tuple[date, date]]:
+        today:date=pendulum.now().date()
+    ) -> Optional[pendulum.period]:
     """
     Takes the user date string and returns a time range tuple.
 
@@ -115,23 +130,21 @@ def date_range_str(
 
         - The possibilities are:
 
-        - A 4 digit year -> yyyy -> 0000 - 9999
+        - yyyy - A 4 digit year -> -> 0000 - 9999
 
-        - An isoyear-iso month (yyyy-mm)
+        - yyyy-mm - An isoyear-iso month
 
-        - Isoweek (yyyyWnn), week (01 - 53)
-            - assumes it is a week in the past of the current year
+        - yyyyWnn - Isoweek, week (2022W05)
 
-        - Isodate - a date in iso format (yyyy-mm-dd)
+        - yyyy-mm-dd - Isodate
 
-        - Week number - 1 to 53
+        - n - Week number - 1 to 53
             - assumes current year
 
-        - Week offset (0, -1, -2)
-            - the relative week less than or equal to 0,
+        - n - Relative week offset (0, -1, -2)
+            - The relative week less than or equal to 0,
 
-        - date range
-            - that is one yyyy-mm-dd to another ("yyyy-mm-dd to yyyy-mm-dd")
+        - yyyy-mm-dd - yyyy-mm-dd - Date Range/Period/Duration
 
     # Return
 
@@ -189,12 +202,12 @@ def date_range_str(
 
         try:
 
-            start_date = date(*sd)
-            end_date = date(*ed)
+            start_date = pendulum.date(*sd)
+            end_date = pendulum.date(*ed)
 
         except ValueError as ve:
             raise ValueError(f"{user_date} contains an invalid date!") from ve
 
-        return (start_date, end_date)
+        return pendulum.period(start_date, end_date)
 
     return None

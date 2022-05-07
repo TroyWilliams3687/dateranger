@@ -5,7 +5,7 @@
 # They should be installed when we install the app. They are strictly required
 # here but offer another form of documentation.
 
-tzdata  # support ZoneInfo properly on Windows
+pendulum
 
 # ------------
 # Custom Repo

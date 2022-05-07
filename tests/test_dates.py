@@ -18,13 +18,14 @@
 # System Modules - Included with Python
 
 
-from datetime import date
+# from datetime import date
 # from datetime import time
 
 # ------------
 # 3rd Party - From pip
 
 import pytest
+import pendulum
 
 # ------------
 # Custom Modules
@@ -165,17 +166,17 @@ def test_date_from_string_year_no_matches(data):
 #  Testing date_from_str
 
 data = []
-data.append(('2022',(date(2022,1,1), date(2022,12,31))))
-data.append(('2022-07',(date(2022,7,1), date(2022,7,31))))
-data.append(('2022-07-31',(date(2022,7,31), date(2022,7,31))))
-data.append(('2022W03', (date(2022,1,17),date(2022,1,23))))
-data.append(('2020-01-01 - 2020-07-31', (date(2020,1,1), date(2020,7,31)) ))
+data.append(('2022',       pendulum.period(pendulum.date(2022,1,1), pendulum.date(2022,12,31))))
+data.append(('2022-07',    pendulum.period(pendulum.date(2022,7,1), pendulum.date(2022,7,31))))
+data.append(('2022-07-31', pendulum.period(pendulum.date(2022,7,31), pendulum.date(2022,7,31))))
+data.append(('2022W03',    pendulum.period(pendulum.date(2022,1,17),pendulum.date(2022,1,23))))
+data.append(('2020-01-01 - 2020-07-31', pendulum.period(pendulum.date(2020,1,1), pendulum.date(2020,7,31))))
 
 # week offset
-data.append((date(2022, 3, 1), '-1', (date(2022,2,21),date(2022,2,27))))
+data.append((pendulum.date(2022, 3, 1), '-1', pendulum.period(pendulum.date(2022,2,21),pendulum.date(2022,2,27))))
 
 # Week number
-data.append((date(2022, 3, 1), '1', (date(2022,1,3),date(2022,1,9))))
+data.append((pendulum.date(2022, 3, 1), '1', pendulum.period(pendulum.date(2022,1,3),pendulum.date(2022,1,9))))
 
 @pytest.mark.parametrize('data', data)
 def test_date_from_str(data):

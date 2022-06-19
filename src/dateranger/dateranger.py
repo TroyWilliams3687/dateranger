@@ -25,7 +25,7 @@ are also many help methods in this module.
 import pendulum
 
 from datetime import date
-from typing import Optional
+from typing import Optional, Generator
 
 # ------------
 # 3rd Party - From PyPI
@@ -114,6 +114,22 @@ def date_range_from_weekoffset(
     ed = sd.end_of('week')
 
     return pendulum.period(sd, ed)
+
+def weeks_from_date_range(
+        start_date:pendulum.date=None,
+        end_date:pendulum.date=None
+        ) -> Generator:
+    """
+    Given a start and end date, iterate through the weeks. It will
+    return the start and end date for each isoweek.
+    """
+
+    period = pendulum.period(start_date, end_date)
+
+    for dt in period.range('weeks'):
+
+        year, week, _ = dt.isocalendar()
+        yield date_range_from_week(year, week)
 
 
 def date_range_str(

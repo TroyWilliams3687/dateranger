@@ -18,7 +18,7 @@
 # System Modules - Included with Python
 
 
-# from datetime import date
+from datetime import date
 # from datetime import time
 
 # ------------
@@ -31,7 +31,7 @@ import pendulum
 # Custom Modules
 
 from dateranger.datestr import date_from_string
-from dateranger.dateranger import date_range_str
+from dateranger.dateranger import date_range_str, weeks_from_date_range
 
 # ------------
 # 'year'
@@ -187,3 +187,66 @@ def test_date_from_str(data):
 
         case (value, result):
             assert date_range_str(value) == result
+
+
+# ============
+#  Testing weeks_from_date_range
+
+data = []
+
+date_inputs = (
+    pendulum.date(2022,1,4),
+    pendulum.date(2022,2,4),
+)
+
+date_outputs = (
+    pendulum.period(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
+    pendulum.period(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
+    pendulum.period(pendulum.date(2022,1,17), pendulum.date(2022,1,23)),
+    pendulum.period(pendulum.date(2022,1,24), pendulum.date(2022,1,30)),
+    pendulum.period(pendulum.date(2022,1,31), pendulum.date(2022,2,6)),
+)
+
+data.append((date_inputs, date_outputs))
+
+
+
+date_inputs = (
+    pendulum.date(2021,12,18),
+    pendulum.date(2022,1,10),
+)
+
+date_outputs = (
+    pendulum.period(pendulum.date(2021,12,13), pendulum.date(2021,12,19)),
+    pendulum.period(pendulum.date(2021,12,20), pendulum.date(2021,12,26)),
+    pendulum.period(pendulum.date(2021,12,27), pendulum.date(2022,1,2)),
+    pendulum.period(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
+    pendulum.period(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
+)
+
+data.append((date_inputs, date_outputs))
+
+
+date_inputs = (
+    date(2021,12,18),
+    date(2022,1,10),
+)
+
+date_outputs = (
+    pendulum.period(date(2021,12,13), date(2021,12,19)),
+    pendulum.period(date(2021,12,20), date(2021,12,26)),
+    pendulum.period(date(2021,12,27), date(2022,1,2)),
+    pendulum.period(date(2022,1,3), date(2022,1,9)),
+    pendulum.period(date(2022,1,10), date(2022,1,16)),
+)
+
+data.append((date_inputs, date_outputs))
+
+@pytest.mark.parametrize('data', data)
+def test_weeks_from_date_range(data):
+
+    inputs, outputs = data
+
+    for results, output in zip(weeks_from_date_range(*inputs), outputs):
+        assert results == output
+

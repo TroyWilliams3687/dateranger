@@ -43,10 +43,8 @@ def date_range_from_year(year:int) -> pendulum.period:
     the year.
     """
 
-    sd = pendulum.date(year, 1, 1)
-
     return pendulum.period(
-        sd,
+        sd:= pendulum.date(year, 1, 1),
         sd.end_of('year'),
     )
 

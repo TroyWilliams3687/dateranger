@@ -37,13 +37,13 @@ from . import datestr as dts
 
 # -------------
 
-def date_range_from_year(year:int) -> pendulum.period:
+def date_range_from_year(year:int) -> pendulum.interval:
     """
     Given a year, return a tuple containing the start and end date of
     the year.
     """
 
-    return pendulum.period(
+    return pendulum.interval(
         sd:= pendulum.date(year, 1, 1),
         sd.end_of('year'),
     )
@@ -51,13 +51,13 @@ def date_range_from_year(year:int) -> pendulum.period:
 
 def date_range_from_year_month(
         year:int,
-        month:int) -> pendulum.period:
+        month:int) -> pendulum.interval:
     """
     Given a year and a month, return a tuple containing the start and
     end date of the month.
     """
 
-    return pendulum.period(
+    return pendulum.interval(
         sd := pendulum.date(year, month, 1),
         sd.end_of('month'),
     )
@@ -66,7 +66,7 @@ def date_range_from_year_month(
 def date_range_from_day(
         year:int,
         month:int,
-        day:int) -> pendulum.period:
+        day:int) -> pendulum.interval:
     """
     Given a year, a month and a day, return a tuple containing the start
     and end date of the day
@@ -74,13 +74,13 @@ def date_range_from_day(
     NOTE: The start and end will be the same.
     """
 
-    return pendulum.period(
+    return pendulum.interval(
         d := pendulum.date(year, month, day),
         d,
     )
 
 
-def date_range_from_week(year:int, week:int) -> pendulum.period:
+def date_range_from_week(year:int, week:int) -> pendulum.interval:
     """
     Given a year and a isoweek number, return a tuple containing the
     start and end date of the week.
@@ -92,13 +92,13 @@ def date_range_from_week(year:int, week:int) -> pendulum.period:
 
     ed = sd.end_of('week')
 
-    return pendulum.period(sd, ed)
+    return pendulum.interval(sd, ed)
 
 
 def date_range_from_weekoffset(
         year:int,
         week:int,
-        offset:int) -> pendulum.period:
+        offset:int) -> pendulum.interval:
     """
     Given a year, a week and a week offset (0, -1, -2, ... -n), return a
     tuple containing the start and end date of the week.
@@ -111,7 +111,7 @@ def date_range_from_weekoffset(
     sd = sd.add(weeks=offset)
     ed = sd.end_of('week')
 
-    return pendulum.period(sd, ed)
+    return pendulum.interval(sd, ed)
 
 def weeks_from_date_range(
         start_date:pendulum.date=None,
@@ -122,7 +122,7 @@ def weeks_from_date_range(
     return the start and end date for each isoweek.
     """
 
-    period = pendulum.period(start_date, end_date)
+    period = pendulum.interval(start_date, end_date)
 
     for dt in period.range('weeks'):
 
@@ -133,7 +133,7 @@ def weeks_from_date_range(
 def date_range_str(
         user_date: str,
         today:date=pendulum.now().date()
-    ) -> Optional[pendulum.period]:
+    ) -> Optional[pendulum.interval]:
     """
     Takes the user date string and returns a time range tuple.
 
@@ -222,6 +222,6 @@ def date_range_str(
         except ValueError as ve:
             raise ValueError(f"{user_date} contains an invalid date!") from ve
 
-        return pendulum.period(start_date, end_date)
+        return pendulum.interval(start_date, end_date)
 
     return None

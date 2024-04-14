@@ -166,17 +166,17 @@ def test_date_from_string_year_no_matches(data):
 #  Testing date_from_str
 
 data = []
-data.append(('2022',       pendulum.period(pendulum.date(2022,1,1), pendulum.date(2022,12,31))))
-data.append(('2022-07',    pendulum.period(pendulum.date(2022,7,1), pendulum.date(2022,7,31))))
-data.append(('2022-07-31', pendulum.period(pendulum.date(2022,7,31), pendulum.date(2022,7,31))))
-data.append(('2022W03',    pendulum.period(pendulum.date(2022,1,17),pendulum.date(2022,1,23))))
-data.append(('2020-01-01 - 2020-07-31', pendulum.period(pendulum.date(2020,1,1), pendulum.date(2020,7,31))))
+data.append(('2022',       pendulum.interval(pendulum.date(2022,1,1), pendulum.date(2022,12,31))))
+data.append(('2022-07',    pendulum.interval(pendulum.date(2022,7,1), pendulum.date(2022,7,31))))
+data.append(('2022-07-31', pendulum.interval(pendulum.date(2022,7,31), pendulum.date(2022,7,31))))
+data.append(('2022W03',    pendulum.interval(pendulum.date(2022,1,17),pendulum.date(2022,1,23))))
+data.append(('2020-01-01 - 2020-07-31', pendulum.interval(pendulum.date(2020,1,1), pendulum.date(2020,7,31))))
 
 # week offset
-data.append((pendulum.date(2022, 3, 1), '-1', pendulum.period(pendulum.date(2022,2,21),pendulum.date(2022,2,27))))
+data.append((pendulum.date(2022, 3, 1), '-1', pendulum.interval(pendulum.date(2022,2,21),pendulum.date(2022,2,27))))
 
 # Week number
-data.append((pendulum.date(2022, 3, 1), '1', pendulum.period(pendulum.date(2022,1,3),pendulum.date(2022,1,9))))
+data.append((pendulum.date(2022, 3, 1), '1', pendulum.interval(pendulum.date(2022,1,3),pendulum.date(2022,1,9))))
 
 @pytest.mark.parametrize('data', data)
 def test_date_from_str(data):
@@ -200,11 +200,11 @@ date_inputs = (
 )
 
 date_outputs = (
-    pendulum.period(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
-    pendulum.period(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
-    pendulum.period(pendulum.date(2022,1,17), pendulum.date(2022,1,23)),
-    pendulum.period(pendulum.date(2022,1,24), pendulum.date(2022,1,30)),
-    pendulum.period(pendulum.date(2022,1,31), pendulum.date(2022,2,6)),
+    pendulum.interval(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
+    pendulum.interval(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
+    pendulum.interval(pendulum.date(2022,1,17), pendulum.date(2022,1,23)),
+    pendulum.interval(pendulum.date(2022,1,24), pendulum.date(2022,1,30)),
+    pendulum.interval(pendulum.date(2022,1,31), pendulum.date(2022,2,6)),
 )
 
 data.append((date_inputs, date_outputs))
@@ -217,11 +217,11 @@ date_inputs = (
 )
 
 date_outputs = (
-    pendulum.period(pendulum.date(2021,12,13), pendulum.date(2021,12,19)),
-    pendulum.period(pendulum.date(2021,12,20), pendulum.date(2021,12,26)),
-    pendulum.period(pendulum.date(2021,12,27), pendulum.date(2022,1,2)),
-    pendulum.period(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
-    pendulum.period(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
+    pendulum.interval(pendulum.date(2021,12,13), pendulum.date(2021,12,19)),
+    pendulum.interval(pendulum.date(2021,12,20), pendulum.date(2021,12,26)),
+    pendulum.interval(pendulum.date(2021,12,27), pendulum.date(2022,1,2)),
+    pendulum.interval(pendulum.date(2022,1,3), pendulum.date(2022,1,9)),
+    pendulum.interval(pendulum.date(2022,1,10), pendulum.date(2022,1,16)),
 )
 
 data.append((date_inputs, date_outputs))
@@ -233,11 +233,11 @@ date_inputs = (
 )
 
 date_outputs = (
-    pendulum.period(date(2021,12,13), date(2021,12,19)),
-    pendulum.period(date(2021,12,20), date(2021,12,26)),
-    pendulum.period(date(2021,12,27), date(2022,1,2)),
-    pendulum.period(date(2022,1,3), date(2022,1,9)),
-    pendulum.period(date(2022,1,10), date(2022,1,16)),
+    pendulum.interval(date(2021,12,13), date(2021,12,19)),
+    pendulum.interval(date(2021,12,20), date(2021,12,26)),
+    pendulum.interval(date(2021,12,27), date(2022,1,2)),
+    pendulum.interval(date(2022,1,3), date(2022,1,9)),
+    pendulum.interval(date(2022,1,10), date(2022,1,16)),
 )
 
 data.append((date_inputs, date_outputs))
